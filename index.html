@@ -28,8 +28,9 @@
   </form>
   <script src="https://cdn.jsdelivr.net/npm/pdf-lib/dist/pdf-lib.min.js"></script>
   <script>
-    const PDFLib = window['pdf-lib'];
-    const { PDFDocument, PDFA1b } = PDFLib;
+
+    const { PDFDocument, PDFA1b } = window['pdf-lib'];
+
 
     // Seleciona o botão "Converter para PDF/A"
     const convertBtn = document.getElementById('convert-btn');
@@ -53,18 +54,18 @@
       }
     });
 
-    // Função para converter o PDF para PDF/A
     async function convertToPDFA(pdfFile) {
-      
-      // Carrega o arquivo PDF
-      const pdfData = await pdfFile.arrayBuffer();
-      const pdfDoc = await PDFDocument.load(pdfData);
+  // Carrega o arquivo PDF
+  const arrayBuffer = await pdfFile.arrayBuffer();
+  const uint8Array = new Uint8Array(arrayBuffer);
+  const pdfDoc = await PDFDocument.load(uint8Array);
 
-      // Converte para PDF/A
-      const pdfA = await pdfDoc.saveAsBuffer({ useObjectStreams: false, useStreams: false, pdfA: PDFA1b });
+  // Converte para PDF/A
+  const pdfA = await pdfDoc.saveAsBuffer({ useObjectStreams: false, useStreams: false, pdfA: PDFA1b });
 
-      return pdfA;
-    }
+  return pdfA;
+}
+
 
     // Função para criar um link de download e baixar o arquivo PDF/A
     function downloadPDF(pdfFile, pdfAData) {

@@ -28,6 +28,8 @@
   </form>
   <script src="https://cdn.jsdelivr.net/npm/pdf-lib/dist/pdf-lib.min.js"></script>
   <script>
+    import { PDFDocument, PDFA1b } from 'pdf-lib';
+
     // Seleciona o botão "Converter para PDF/A"
     const convertBtn = document.getElementById('convert-btn');
 
@@ -52,9 +54,7 @@
 
     // Função para converter o PDF para PDF/A
     async function convertToPDFA(pdfFile) {
-      // Importa a biblioteca pdf-lib
-      const { PDFDocument, PDFA1b } = window['pdf-lib'];
-
+      
       // Carrega o arquivo PDF
       const pdfData = await pdfFile.arrayBuffer();
       const pdfDoc = await PDFDocument.load(pdfData);

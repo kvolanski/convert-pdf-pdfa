@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Converter PDF para PDF/A</title>
+  <style>
+    /* estilo básico para o formulário e botão */
+    form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 50px;
+    }
+    label, input {
+      margin: 10px 0;
+    }
+    button {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Converter PDF para PDF/A</h1>
+  <form>
+    <label for="pdf-file">Selecione um arquivo PDF:</label>
+    <input type="file" id="pdf-file" accept=".pdf">
+    <button type="button" id="convert-btn">Converter para PDF/A</button>
+  </form>
+  <script>
+    // Importe a biblioteca pdf-lib
+    const { PDFDocument, PDF/A1b } = window['pdf-lib'];
+
+    // Selecione o botão "Converter para PDF/A"
+    const convertBtn = document.getElementById('convert-btn');
+
+    // Adicione um listener de evento para o botão "Converter para PDF/A"
+    convertBtn.addEventListener('click', async () => {
+      // Selecione o arquivo PDF carregado pelo usuário
+      const pdfFile = document.getElementById('pdf-file').files[0];
+      // Verifique se um arquivo foi selecionado
+      if (!pdfFile) {
+        alert('Por favor, selecione um arquivo PDF.');
+        return;
+      }
+      // Carrega o arquivo PDF
+      const pdfData = await pdfFile.arrayBuffer();
+      const pdfDoc = await PDFDocument.load(pdfData);
+
+      // Converte para PDF/A
+      const pdfA = await pdfDoc.saveAsBuffer({ useObjectStreams: false, useStreams: false, pdfA: PDF/A1b });
+
+      // Cria um link de download para o arquivo PDF/A
+      const pdfALink = document.createElement('a');
+      pdfALink.href = URL.createObjectURL(new Blob([pdfA], { type: 'application/pdf' }));
+      pdfALink.download = pdfFile.name.replace('.pdf', '') + '-pdfa.pdf';
+
+      // Clique no link para baixar o arquivo PDF/A
+      document.body.appendChild(pdfALink);
+      pdfALink.click();
+      document.body.removeChild(pdfALink);
+    });
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/pdf-lib/dist/pdf-lib.min.js"></script>
+</body>
+</html>

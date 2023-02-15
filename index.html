@@ -26,57 +26,56 @@
     <input type="file" id="pdf-file" accept=".pdf">
     <button type="button" id="convert-btn">Converter para PDF/A</button>
   </form>
+  <script src="https://cdn.jsdelivr.net/npm/pdf-lib/dist/pdf-lib.min.js"></script>
   <script>
-    // carrega o módulo pdf-lib usando a API fetch
-    fetch('https://cdn.jsdelivr.net/npm/pdf-lib/dist/pdf-lib.min.js')
-      .then(response => response.text())
-      .then(script => {
-        // executa o código do módulo dentro do escopo do script
-        eval(script);
+    const PDFLib = window['pdf-lib'];
+    const { PDFDocument, PDFA1b } = PDFLib;
 
-        // Seleciona o botão "Converter para PDF/A"
-        const convertBtn = document.getElementById('convert-btn');
+    // Seleciona o botão "Converter para PDF/A"
+    const convertBtn = document.getElementById('convert-btn');
 
-        // Adiciona um listener de evento para o botão "Converter para PDF/A"
-        convertBtn.addEventListener('click', async () => {
-          // Verifica se um arquivo foi selecionado
-          const pdfFile = document.getElementById('pdf-file').files[0];
-          if (!pdfFile) {
-            alert('Por favor, selecione um arquivo PDF.');
-            return;
-          }
+    // Adiciona um listener de evento para o botão "Converter para PDF/A"
+    convertBtn.addEventListener('click', async () => {
+      // Verifica se um arquivo foi selecionado
+      const pdfFile = document.getElementById('pdf-file').files[0];
+      if (!pdfFile) {
+        alert('Por favor, selecione um arquivo PDF.');
+        return;
+      }
 
-          // Chama a função para converter o PDF para PDF/A
-          try {
-            const pdfAData = await convertToPDFA(pdfFile);
-            downloadPDF(pdfFile, pdfAData);
-          } catch (error) {
-            console.error(error);
-            alert('Ocorreu um erro ao converter o PDF para PDF/A.');
-          }
-        });
+      // Chama a função para converter o PDF para PDF/A
+      try {
+        const pdfAData = await convertToPDFA(pdfFile);
+        downloadPDF(pdfFile, pdfAData);
+      } catch (error) {
+        console.error(error);
+        alert('Ocorreu um erro ao converter o PDF para PDF/A.');
+      }
+    });
 
-        // Função para converter o PDF para PDF/A
-        async function convertToPDFA(pdfFile) {
-          
-          // Carrega o arquivo PDF
-          const pdfData = await pdfFile.arrayBuffer();
-          const pdfDoc = await PDFDocument.load(pdfData);
+    // Função para converter o PDF para PDF/A
+    async function convertToPDFA(pdfFile) {
+      
+      // Carrega o arquivo PDF
+      const pdfData = await pdfFile.arrayBuffer();
+      const pdfDoc = await PDFDocument.load(pdfData);
 
-          // Converte para PDF/A
-          const pdfA = await pdfDoc.saveAsBuffer({ useObjectStreams: false, useStreams: false, pdfA: PDFA1b });
+      // Converte para PDF/A
+      const pdfA = await pdfDoc.saveAsBuffer({ useObjectStreams: false, useStreams: false, pdfA: PDFA1b });
 
-          return pdfA;
-        }
+      return pdfA;
+    }
 
-        // Função para criar um link de download e baixar o arquivo PDF/A
-        function downloadPDF(pdfFile, pdfAData) {
-          const pdfALink = document.createElement('a');
-          pdfALink.href = URL.createObjectURL(new Blob([pdfAData], { type: 'application/pdf' }));
-          pdfALink.download = pdfFile.name.replace('.pdf', '') + '-pdfa.pdf';
+    // Função para criar um link de download e baixar o arquivo PDF/A
+    function downloadPDF(pdfFile, pdfAData) {
+      const pdfALink = document.createElement('a');
+      pdfALink.href = URL.createObjectURL(new Blob([pdfAData], { type: 'application/pdf' }));
+      pdfALink.download = pdfFile.name.replace('.pdf', '') + '-pdfa.pdf';
 
-          document.body.appendChild(pdfALink);
-          pdfALink.click();
-          document.body.removeChild(pdfALink);
-        }
-      })
+      document.body.appendChild(pdfALink);
+      pdfALink.click();
+      document.body.removeChild(pdfALink);
+    }
+  </script>
+</body>
+</html>

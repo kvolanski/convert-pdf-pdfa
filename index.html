@@ -28,38 +28,53 @@
   </form>
   <script src="https://cdn.jsdelivr.net/npm/pdf-lib/dist/pdf-lib.min.js"></script>
   <script>
-const { PDFDocument, PDF_A1b } = PDFLib;
+    // Seleciona o botão "Converter para PDF/A"
+    const convertBtn = document.getElementById('convert-btn');
 
-// Selecione o botão "Converter para PDF/A"
-const convertBtn = document.getElementById('convert-btn');
+    // Adiciona um listener de evento para o botão "Converter para PDF/A"
+    convertBtn.addEventListener('click', async () => {
+      // Verifica se um arquivo foi selecionado
+      const pdfFile = document.getElementById('pdf-file').files[0];
+      if (!pdfFile) {
+        alert('Por favor, selecione um arquivo PDF.');
+        return;
+      }
 
-// Adicione um listener de evento para o botão "Converter para PDF/A"
-convertBtn.addEventListener('click', async () => {
-  // Selecione o arquivo PDF carregado pelo usuário
-  const pdfFile = document.getElementById('pdf-file').files[0];
-  // Verifique se um arquivo foi selecionado
-  if (!pdfFile) {
-    alert('Por favor, selecione um arquivo PDF.');
-    return;
-  }
-  // Carrega o arquivo PDF
-  const pdfData = await pdfFile.arrayBuffer();
-  const pdfDoc = await PDFDocument.load(pdfData);
+      // Chama a função para converter o PDF para PDF/A
+      try {
+        const pdfAData = await convertToPDFA(pdfFile);
+        downloadPDF(pdfFile, pdfAData);
+      } catch (error) {
+        console.error(error);
+        alert('Ocorreu um erro ao converter o PDF para PDF/A.');
+      }
+    });
 
-  // Converte para PDF/A
-  const pdfA = await pdfDoc.saveAsBuffer({ useObjectStreams: false, useStreams: false, pdfA: PDF_A1b });
+    // Função para converter o PDF para PDF/A
+    async function convertToPDFA(pdfFile) {
+      // Importa a biblioteca pdf-lib
+      const { PDFDocument, PDFA1b } = window['pdf-lib'];
 
-  // Cria um link de download para o arquivo PDF/A
-  const pdfALink = document.createElement('a');
-  pdfALink.href = URL.createObjectURL(new Blob([pdfA], { type: 'application/pdf' }));
-  pdfALink.download = pdfFile.name.replace('.pdf', '') + '-pdfa.pdf';
+      // Carrega o arquivo PDF
+      const pdfData = await pdfFile.arrayBuffer();
+      const pdfDoc = await PDFDocument.load(pdfData);
 
-  // Clique no link para baixar o arquivo PDF/A
-  document.body.appendChild(pdfALink);
-  pdfALink.click();
-  document.body.removeChild(pdfALink);
-});
+      // Converte para PDF/A
+      const pdfA = await pdfDoc.saveAsBuffer({ useObjectStreams: false, useStreams: false, pdfA: PDFA1b });
 
+      return pdfA;
+    }
+
+    // Função para criar um link de download e baixar o arquivo PDF/A
+    function downloadPDF(pdfFile, pdfAData) {
+      const pdfALink = document.createElement('a');
+      pdfALink.href = URL.createObjectURL(new Blob([pdfAData], { type: 'application/pdf' }));
+      pdfALink.download = pdfFile.name.replace('.pdf', '') + '-pdfa.pdf';
+
+      document.body.appendChild(pdfALink);
+      pdfALink.click();
+      document.body.removeChild(pdfALink);
+    }
   </script>
 </body>
 </html>

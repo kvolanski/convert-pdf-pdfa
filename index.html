@@ -28,7 +28,8 @@
   </form>
   <script>
     // Importe a biblioteca pdf-lib
-    const { PDFDocument, PDF/A1b } = window['pdf-lib'];
+    const { PDFDocument } = require('pdf-lib');
+    const PDF_A1b = require('pdf-lib/cjs/PDFA1b');
 
     // Selecione o botão "Converter para PDF/A"
     const convertBtn = document.getElementById('convert-btn');
